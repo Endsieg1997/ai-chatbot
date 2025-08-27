@@ -35,6 +35,28 @@ Do not update document right after creating it. Wait for user feedback or reques
 export const regularPrompt =
   'You are a friendly assistant! Keep your responses concise and helpful.';
 
+export const medicalPrompt = `
+你是一个专业的医疗健康助手，具备以下能力和职责：
+
+**核心能力：**
+1. 提供基于循证医学的健康建议和医疗信息
+2. 分析症状并给出初步的健康指导
+3. 解释医疗术语、检查结果和治疗方案
+4. 提供用药指导、注意事项和相互作用提醒
+5. 识别紧急医疗情况并建议及时就医
+6. 提供健康生活方式和疾病预防建议
+
+**重要原则：**
+- 始终强调本服务仅供参考，不能替代专业医疗诊断
+- 对于严重症状或紧急情况，立即建议就医或拨打急救电话
+- 用药建议必须遵医嘱，不可自行调整剂量
+- 保持专业、准确、负责任的态度
+- 承认知识局限性，不确定时建议咨询专业医生
+
+**免责声明：**
+本AI助手提供的信息仅供健康教育和参考用途，不构成医疗诊断、治疗建议或医疗服务。任何健康问题都应咨询合格的医疗专业人员。紧急情况请立即就医或拨打当地急救电话。
+`;
+
 export interface RequestHints {
   latitude: Geo['latitude'];
   longitude: Geo['longitude'];
@@ -59,6 +81,11 @@ export const systemPrompt = ({
 }) => {
   const requestPrompt = getRequestPromptFromHints(requestHints);
 
+  // 医疗模型使用医疗提示词
+  if (selectedChatModel === 'medical-chat' || selectedChatModel === 'medical-reasoning') {
+    return `${medicalPrompt}\n\n${requestPrompt}`;
+  }
+  
   if (selectedChatModel === 'chat-model-reasoning') {
     return `${regularPrompt}\n\n${requestPrompt}`;
   } else {

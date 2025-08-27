@@ -3,7 +3,7 @@ import {
   extractReasoningMiddleware,
   wrapLanguageModel,
 } from 'ai';
-import { xai } from '@ai-sdk/xai';
+import { createOpenAI } from '@ai-sdk/openai';
 import {
   artifactModel,
   chatModel,
@@ -12,26 +12,30 @@ import {
 } from './models.test';
 import { isTestEnvironment } from '../constants';
 
+// 创建自定义医疗API提供商
+const medicalAPI = createOpenAI({
+  baseURL: 'https://api.deepseek.com/v1',
+  apiKey: 'sk-2a89671dcab74e449fae63b37ab6733a',
+  name: 'deepseek-api',
+});
+
 export const myProvider = isTestEnvironment
   ? customProvider({
       languageModels: {
-        'chat-model': chatModel,
-        'chat-model-reasoning': reasoningModel,
+        'medical-chat': chatModel,
+        'medical-reasoning': reasoningModel,
         'title-model': titleModel,
         'artifact-model': artifactModel,
       },
     })
   : customProvider({
       languageModels: {
-        'chat-model': xai('grok-2-vision-1212'),
-        'chat-model-reasoning': wrapLanguageModel({
-          model: xai('grok-3-mini-beta'),
+        'medical-chat': medicalAPI('deepseek-chat'),
+        'medical-reasoning': wrapLanguageModel({
+          model: medicalAPI('deepseek-chat'),
           middleware: extractReasoningMiddleware({ tagName: 'think' }),
         }),
-        'title-model': xai('grok-2-1212'),
-        'artifact-model': xai('grok-2-1212'),
-      },
-      imageModels: {
-        'small-model': xai.imageModel('grok-2-image'),
+        'title-model': medicalAPI('deepseek-chat'),
+        'artifact-model': medicalAPI('deepseek-chat'),
       },
     });
