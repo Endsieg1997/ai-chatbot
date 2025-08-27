@@ -50,4 +50,4 @@ function PureChatHeader({
   );
 }
 
-export const ChatHeader = memo(PureChatHeader);}]}
+export const ChatHeader = memo(PureChatHeader);
